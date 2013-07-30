@@ -2,22 +2,26 @@ from setuptools import setup, find_packages
 from pkg_resources import require, DistributionNotFound
 import os
 
+def is_installed(package_name):
+    try:
+        require(package_name)
+    except DistributionNotFound:
+        return False
+    else:
+        return True
+
 try:
     filename = os.path.join(os.path.dirname(__file__), 'README')
     description = file(filename).read()
 except:
     description = ''
 
-# Dependency check at run time
-# If PIL is not found, then it is added in the ``install_requires`` list
-install_requires = []   # Empty list if PIL is found
-try:
-    try:
-        require('PIL')
-    except DistributionNotFound:
-        require('Image')
-except DistributionNotFound:
-    install_requires = ['PIL']
+# We want to allow either PIL or Pillow as a dependency.  Because we can't
+# write an `install_requires` declaration that installs either, we make
+# Pillow a dependency at run time if both are missing.
+install_requires = ['Pillow'] 
+if is_installed('PIL') or is_installed('Pillow'):
+    install_requires = []
 
 version = '0.1.7a'
 
